@@ -201,7 +201,7 @@
             <div class="section-title"><h2>Certificado "Guerrero Batch"</h2><p>Solo al completar los 6 pasos podrás generarlo.</p></div>
             <div class="certificate-container">
                 <div class="certificate" id="certificatePreview">
-                    <h3>CERTIFICADO</h3><h4>DE COMPLETACIÓN</h4><p>Otorgado a:</p><h2 id="userName">[Tu Nombre]</h2><p>por haber completado con éxito el</p><h3>RETO WEB BATCH</h3><p>demostrando dominio de los conceptos fundamentales de Batch.</p><p><strong>Fecha:</strong> <span id="certificateDate">28 de enero de 2024</span></p>
+                    <h3>CERTIFICADO</h3><h4>DE COMPLETACIÓN</h4><p>Otorgado a:</p><h2 id="userName">[Tu Nombre]</h2><p>por haber completado con éxito el</p><h3>RETO WEB BATCH</h3><p> dominio de los conceptos fundamentales de Batch.</p><p><strong>Fecha:</strong> <span id="certificateDate">28 de enero de 2024</span></p>
                     <div class="certificate-stamp"><div style="font-family: 'Times New Roman', serif; font-size: 0.8rem; color: #8b4513; text-align: center; border: 2px solid #8b4513; padding: 5px; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;">RETO<br>WEB<br>BATCH</div></div>
                 </div>
                 <div><button class="generate-certificate-btn" id="generateCertificateBtn">Generar Mi Certificado</button><button class="download-btn" id="downloadCertificateBtn" style="display: none;"><i class="fas fa-download"></i> Descargar Certificado</button></div>
@@ -493,6 +493,34 @@
                 const parts = input.split(' ');
                 const base = parts[0].toLowerCase();
 
+                // --- VERIFICAR SI ES UNA TAREA DEL PASO ACTUAL ---
+                const currentStep = userProgress.currentStep;
+                if (currentStep <= 6) {
+                    const lesson = lessons[currentStep];
+                    // Buscar tarea pendiente que coincida exactamente con el input (ignorando mayúsculas, espacios extras)
+                    const task = lesson.tasks.find(t => 
+                        !userProgress.tasksCompleted[currentStep].includes(t.id) && 
+                        (input === t.expected || (t.altExpected && input === t.altExpected))
+                    );
+                    if (task) {
+                        // Marcar tarea como completada
+                        userProgress.tasksCompleted[currentStep].push(task.id);
+                        saveProgress();
+                        addLine('✅ ' + task.success, 'success');
+                        
+                        // Verificar si con esta tarea ya se completaron todas las tareas de la lección
+                        const allTasksCompleted = lesson.tasks.every(t => userProgress.tasksCompleted[currentStep].includes(t.id));
+                        if (allTasksCompleted) {
+                            addLine('🎓 ¡Has completado todas las tareas de esta lección!', 'success');
+                            addLine('Escribe "continuar" para avanzar a la siguiente lección.', 'info');
+                            // Opcional: completar el paso automáticamente (algunos prefieren que sea manual)
+                            // completeStep(currentStep); // Si se desea automático, descomentar esta línea
+                        }
+                        updateUI();
+                        return;
+                    }
+                }
+
                 // --- COMANDOS GLOBALES ---
                 if (base === 'help') {
                     addLine('COMANDOS DISPONIBLES:', 'info');
@@ -576,36 +604,12 @@
                     return;
                 }
 
-                // --- VERIFICAR SI ES UNA TAREA DEL PASO ACTUAL ---
-                const currentStep = userProgress.currentStep;
                 if (currentStep > 6) {
                     addLine('🎉 ¡Ya terminaste el curso! Puedes generar tu certificado.', 'success');
                     return;
                 }
-                const lesson = lessons[currentStep];
-                // Buscar tarea pendiente que coincida exactamente con el input (ignorando mayúsculas, espacios extras)
-                const task = lesson.tasks.find(t => 
-                    !userProgress.tasksCompleted[currentStep].includes(t.id) && 
-                    (input === t.expected || (t.altExpected && input === t.altExpected))
-                );
-                if (task) {
-                    // Marcar tarea como completada
-                    userProgress.tasksCompleted[currentStep].push(task.id);
-                    saveProgress();
-                    addLine('✅ ' + task.success, 'success');
-                    
-                    // Verificar si con esta tarea ya se completaron todas las tareas de la lección
-                    const allTasksCompleted = lesson.tasks.every(t => userProgress.tasksCompleted[currentStep].includes(t.id));
-                    if (allTasksCompleted) {
-                        addLine('🎓 ¡Has completado todas las tareas de esta lección!', 'success');
-                        addLine('Escribe "continuar" para avanzar a la siguiente lección.', 'info');
-                        // Opcional: completar el paso automáticamente (algunos prefieren que sea manual)
-                        // completeStep(currentStep); // Si se desea automático, descomentar esta línea
-                    }
-                    updateUI();
-                } else {
-                    addLine(`❌ Comando no reconocido o no es parte de los ejercicios actuales. Escribe "help" para ver comandos.`, 'error');
-                }
+
+                addLine(`❌ Comando no reconocido o no es parte de los ejercicios actuales. Escribe "help" para ver comandos.`, 'error');
             }
         }
 
@@ -760,6 +764,10 @@ goto inicio`;
             initTerminal();
             showLesson(userProgress.currentStep);
             updateUI();
+            
+            // Actualizar fecha del certificado con la fecha actual
+            const now = new Date();
+            document.getElementById('certificateDate').innerText = now.toLocaleDateString('es-ES', {year:'numeric', month:'long', day:'numeric'});
             
             // Fondo de código animado
             const codeBackground = document.getElementById('codeBackground');
