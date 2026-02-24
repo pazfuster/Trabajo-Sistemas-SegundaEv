@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Web Batch - Tutorial Interactivo (Corregido)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* (mismos estilos que antes, no los repito por brevedad) */
+        :root {
+            --primary-color: #0c7b93;
+            --secondary-color: #27496d;
+            --accent-color: #00a8cc;
+            --dark-color: #142850;
+            --light-color: #e8f1f5;
+            --success-color: #4CAF50;
+            --terminal-bg: #1e1e1e;
+            --terminal-text: #00ff41;
+            --terminal-border: #0c7b93;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f9fa; color: #333; line-height: 1.6; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header { background: linear-gradient(to right, var(--dark-color), var(--secondary-color)); color: white; padding: 1rem 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: bold; }
+        .logo i { color: var(--accent-color); }
+        nav ul { display: flex; list-style: none; }
+        nav ul li { margin-left: 1.5rem; }
+        nav ul li a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; padding: 5px 10px; border-radius: 4px; }
+        nav ul li a:hover { color: var(--accent-color); background-color: rgba(255,255,255,0.1); }
+        .mobile-menu-btn { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .hero { background: linear-gradient(135deg, var(--dark-color) 0%, var(--primary-color) 100%); color: white; padding: 5rem 0; text-align: center; position: relative; overflow: hidden; }
+        .hero-content { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .hero p { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; }
+        .cta-button { display: inline-block; background-color: var(--accent-color); color: white; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; text-decoration: none; border-radius: 30px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,168,204,0.3); margin: 0 10px; }
+        .cta-button:hover { background-color: #0097b5; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,168,204,0.4); }
+        .hero-bg-elements { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.1; }
+        .code-line { position: absolute; font-family: monospace; color: var(--terminal-text); font-size: 0.9rem; }
+        section { padding: 5rem 0; }
+        .section-title { text-align: center; margin-bottom: 3rem; color: var(--secondary-color); }
+        .section-title h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .section-title p { color: #666; max-width: 700px; margin: 0 auto; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem; }
+        .feature-card { background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: transform 0.3s, box-shadow 0.3s; text-align: center; }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .feature-icon { font-size: 3rem; color: var(--primary-color); margin-bottom: 1.5rem; }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--dark-color); }
+        .terminal-container { background-color: var(--terminal-bg); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-top: 2rem; }
+        .terminal-header { background-color: #333; padding: 10px 15px; display: flex; align-items: center; }
+        .terminal-buttons { display: flex; gap: 8px; }
+        .terminal-button { width: 12px; height: 12px; border-radius: 50%; }
+        .close { background-color: #ff5f56; }
+        .minimize { background-color: #ffbd2e; }
+        .maximize { background-color: #27ca3f; }
+        .terminal-title { color: #aaa; margin-left: 15px; font-size: 0.9rem; }
+        .terminal-body { padding: 20px; font-family: 'Courier New', monospace; color: var(--terminal-text); min-height: 400px; max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; }
+        .terminal-prompt { color: #00a8ff; margin-right: 10px; }
+        .terminal-input { background: transparent; border: none; color: var(--terminal-text); font-family: 'Courier New', monospace; font-size: 1rem; width: calc(100% - 50px); outline: none; }
+        .terminal-line { margin-bottom: 4px; white-space: pre-wrap; word-wrap: break-word; }
+        .terminal-success { color: #4CAF50; }
+        .terminal-error { color: #ff6b6b; }
+        .terminal-info { color: #00a8ff; }
+        .terminal-warning { color: #ffd93d; }
+        .challenge-progress { background-color: white; border-radius: 10px; padding: 2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 2rem; }
+        .progress-bar { height: 10px; background-color: #e0e0e0; border-radius: 5px; margin: 2rem 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(to right, var(--primary-color), var(--accent-color)); width: 0%; transition: width 1s ease-in-out; }
+        .steps-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .step { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary-color); transition: all 0.3s; cursor: pointer; }
+        .step:hover { background-color: #e8f1f5; transform: translateX(5px); }
+        .step.completed { border-left-color: var(--success-color); background-color: #f0f9f0; }
+        .step.locked { opacity: 0.6; cursor: not-allowed; border-left-color: #ccc; }
+        .step-number { display: inline-block; background-color: var(--primary-color); color: white; width: 30px; height: 30px; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 10px; font-weight: bold; }
+        .step.completed .step-number { background-color: var(--success-color); }
+        .step.locked .step-number { background-color: #aaa; }
+        .certificate-container { background-color: white; border-radius: 10px; padding: 2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; margin-top: 2rem; }
+        .certificate { background-color: #f9f5e9; border: 20px solid #d4af37; padding: 3rem; margin: 2rem auto; max-width: 800px; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .certificate h3 { color: #8b4513; font-size: 2.5rem; margin-bottom: 1rem; font-family: 'Times New Roman', serif; }
+        .certificate h4 { color: var(--dark-color); font-size: 1.5rem; margin-bottom: 2rem; font-weight: normal; }
+        .certificate p { font-size: 1.2rem; margin-bottom: 1.5rem; }
+        .certificate-stamp { position: absolute; bottom: 30px; right: 30px; width: 120px; opacity: 0.7; }
+        .generate-certificate-btn { background-color: var(--accent-color); color: white; border: none; padding: 15px 40px; font-size: 1.2rem; border-radius: 30px; cursor: pointer; transition: all 0.3s; font-weight: bold; margin-top: 1rem; }
+        .generate-certificate-btn:hover { background-color: #0097b5; transform: scale(1.05); }
+        .download-btn { background-color: var(--success-color); color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 30px; cursor: pointer; transition: all 0.3s; font-weight: bold; margin-top: 1rem; display: inline-flex; align-items: center; gap: 10px; }
+        .download-btn:hover { background-color: #3d8b40; }
+        .downloads-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .download-card { background-color: white; border-radius: 10px; padding: 2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; transition: transform 0.3s; }
+        .download-card:hover { transform: translateY(-10px); }
+        .download-icon { font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem; }
+        footer { background-color: var(--dark-color); color: white; padding: 3rem 0 1.5rem; }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .footer-section h3 { font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--accent-color); }
+        .footer-section p { margin-bottom: 1rem; opacity: 0.8; }
+        .social-icons { display: flex; gap: 15px; margin-top: 1rem; }
+        .social-icons a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: rgba(255,255,255,0.1); border-radius: 50%; color: white; text-decoration: none; transition: all 0.3s; }
+        .social-icons a:hover { background-color: var(--accent-color); transform: translateY(-5px); }
+        .copyright { text-align: center; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.7; font-size: 0.9rem; }
+        @media (max-width: 768px) {
+            .header-container { flex-direction: column; align-items: flex-start; }
+            nav { width: 100%; margin-top: 1rem; display: none; }
+            nav.active { display: block; }
+            nav ul { flex-direction: column; }
+            nav ul li { margin: 0; margin-bottom: 10px; }
+            .mobile-menu-btn { display: block; position: absolute; top: 20px; right: 20px; }
+            .hero h1 { font-size: 2.2rem; }
+            section { padding: 3rem 0; }
+            .section-title h2 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo"><i class="fas fa-terminal"></i><span>Reto Web Batch</span></div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+            <nav id="mainNav">
+                <ul>
+                    <li><a href="#home">Inicio</a></li>
+                    <li><a href="#about">Sobre Batch</a></li>
+                    <li><a href="#challenge">Reto</a></li>
+                    <li><a href="#course">Curso</a></li>
+                    <li><a href="#downloads">Descargas</a></li>
+                    <li><a href="#certificate">Certificado</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-bg-elements" id="codeBackground"></div>
+        <div class="container hero-content">
+            <h1>Reto Web Batch</h1>
+            <p>Aprende Batch desde cero con nuestro tutorial interactivo en terminal. Escribe comandos reales, supera ejercicios y obtén tu certificado de "Guerrero Batch".</p>
+            <div><a href="#terminal" class="cta-button">Comenzar Ahora</a><a href="#challenge" class="cta-button">Ver Progreso</a></div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <div class="section-title"><h2>¿Qué es Batch?</h2><p>Batch es el lenguaje de scripting nativo de Windows. Con él puedes automatizar tareas, crear utilidades, menús interactivos y hasta juegos de consola.</p></div>
+            <div class="features">
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-history"></i></div><h3>Historia</h3><p>Desde MS-DOS (1981) hasta Windows 11, los archivos .bat han sido la puerta de entrada a la programación para millones de usuarios.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-cogs"></i></div><h3>Fácil de aprender</h3><p>Solo necesitas un editor de texto y el Símbolo del sistema. Sin instalaciones complejas.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-gamepad"></i></div><h3>Crea tus propios juegos</h3><p>Aventuras de texto, adivinanzas, piedra papel o tijera... Todo es posible en Batch.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="terminal">
+        <div class="container">
+            <div class="section-title"><h2>Terminal de Aprendizaje</h2><p>Aquí se desarrolla el curso. Sigue las instrucciones, escribe los comandos y avanza paso a paso.</p></div>
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <div class="terminal-buttons"><div class="terminal-button close"></div><div class="terminal-button minimize"></div><div class="terminal-button maximize"></div></div>
+                    <div class="terminal-title">Reto Batch - Consola Interactiva</div>
+                </div>
+                <div class="terminal-body" id="terminalOutput"></div>
+            </div>
+            <div style="margin-top: 10px; color: #666; font-size: 0.9rem; text-align: center;"><i class="fas fa-info-circle"></i> Escribe <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">help</span> para ver los comandos disponibles.</div>
+        </div>
+    </section>
+
+    <section id="challenge" style="background-color: #f0f7fa;">
+        <div class="container">
+            <div class="section-title"><h2>Tu progreso en el reto</h2><p>Completa los 6 pasos en la terminal. Cada paso te enseñará algo nuevo.</p></div>
+            <div class="challenge-progress">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%;"></div></div>
+                <div class="steps-container" id="stepsContainer"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="course">
+        <div class="container">
+            <div class="section-title"><h2>Mini-Curso de Batch</h2><p>6 lecciones prácticas. Aprende haciendo.</p></div>
+            <div class="features">
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-book-open"></i></div><h3>1. Introducción</h3><p>Qué es Batch, cómo funciona, primeros pasos.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-echo"></i></div><h3>2. Comandos esenciales</h3><p>echo, pause, cls, color, title.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-code"></i></div><h3>3. Variables y entrada</h3><p>set, set /p, leer datos del usuario.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-sitemap"></i></div><h3>4. Estructuras de control</h3><p>if, for, goto. Lógica en scripts.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-bars"></i></div><h3>5. Menús interactivos</h3><p>Crea tu propio menú con opciones.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-trophy"></i></div><h3>6. Desarrolla tu BAT</h3><p>Proyecto final y certificado.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="downloads" style="background-color: #f0f7fa;">
+        <div class="container">
+            <div class="section-title"><h2>Kit de Descargas</h2><p>Scripts listos para usar e inspirarte.</p></div>
+            <div class="downloads-container">
+                <div class="download-card"><div class="download-icon"><i class="fas fa-file-code"></i></div><h3>Scripts de Ejemplo</h3><p>Colección comentada: hola mundo, calculadora, administrador.</p><button class="download-btn" onclick="downloadFile('scripts-ejemplo.zip', 'scripts-batch-ejemplo.zip')"><i class="fas fa-download"></i> Descargar</button></div>
+                <div class="download-card"><div class="download-icon"><i class="fas fa-gamepad"></i></div><h3>Juego en Batch</h3><p>Juego de adivinanza y aventura de texto.</p><button class="download-btn" onclick="downloadFile('juego-batch.zip', 'juego-aventura-batch.zip')"><i class="fas fa-download"></i> Descargar</button></div>
+                <div class="download-card"><div class="download-icon"><i class="fas fa-tools"></i></div><h3>Programa de Mantenimiento</h3><p>Limpia temporales, optimiza el sistema.</p><button class="download-btn" onclick="downloadMantenimientoBat()"><i class="fas fa-download"></i> Descargar</button></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="certificate">
+        <div class="container">
+            <div class="section-title"><h2>Certificado "Guerrero Batch"</h2><p>Solo al completar los 6 pasos podrás generarlo.</p></div>
+            <div class="certificate-container">
+                <div class="certificate" id="certificatePreview">
+                    <h3>CERTIFICADO</h3><h4>DE COMPLETACIÓN</h4><p>Otorgado a:</p><h2 id="userName">[Tu Nombre]</h2><p>por haber completado con éxito el</p><h3>RETO WEB BATCH</h3><p>demostrando dominio de los conceptos fundamentales de Batch.</p><p><strong>Fecha:</strong> <span id="certificateDate">28 de enero de 2024</span></p>
+                    <div class="certificate-stamp"><div style="font-family: 'Times New Roman', serif; font-size: 0.8rem; color: #8b4513; text-align: center; border: 2px solid #8b4513; padding: 5px; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;">RETO<br>WEB<br>BATCH</div></div>
+                </div>
+                <div><button class="generate-certificate-btn" id="generateCertificateBtn">Generar Mi Certificado</button><button class="download-btn" id="downloadCertificateBtn" style="display: none;"><i class="fas fa-download"></i> Descargar Certificado</button></div>
+                <div style="margin-top: 2rem;"><p><strong>Personaliza tu certificado:</strong></p><input type="text" id="nameInput" placeholder="Escribe tu nombre" style="padding: 10px; width: 300px; max-width: 100%; border: 1px solid #ccc; border-radius: 4px;"><button onclick="updateCertificateName()" style="padding: 10px 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; margin-left: 10px; cursor: pointer;">Actualizar</button></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><h3>Reto Web Batch</h3><p>Proyecto educativo para aprender Batch desde cero. Creado con ❤️ para estudiantes, docentes y entusiastas.</p><div class="social-icons"><a href="#"><i class="fab fa-github"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-linkedin-in"></i></a></div></div>
+                <div class="footer-section"><h3>Enlaces Rápidos</h3><p><a href="#home" style="color: white; text-decoration: none;">Inicio</a></p><p><a href="#terminal" style="color: white; text-decoration: none;">Terminal</a></p><p><a href="#challenge" style="color: white; text-decoration: none;">Reto</a></p><p><a href="#certificate" style="color: white; text-decoration: none;">Certificado</a></p></div>
+                <div class="footer-section"><h3>Recursos</h3><p><a href="#downloads" style="color: white; text-decoration: none;">Descargas</a></p><p><a href="#course" style="color: white; text-decoration: none;">Curso</a></p></div>
+            </div>
+            <div class="copyright"><p>&copy; 2025 Reto Web Batch. Aprende programación de forma práctica.</p></div>
+        </div>
+    </footer>
+
+    <script>
+        // ------------------------------------------------------------
+        // SISTEMA DE TUTORIAL INTERACTIVO POR CONSOLA - VERSIÓN CORREGIDA
+        // ------------------------------------------------------------
+
+        // Estado global del progreso (con localStorage)
+        let userProgress = {
+            currentStep: 1,
+            completedSteps: [],
+            tasksCompleted: {1:[],2:[],3:[],4:[],5:[],6:[]}
+        };
+
+        // Definición de las 6 lecciones
+        const lessons = {
+            1: {
+                title: "Introducción a Batch",
+                content: [
+                    {type: "info", text: "=== LECCIÓN 1: INTRODUCCIÓN A BATCH ==="},
+                    {type: "text", text: "Batch (archivos .bat o .cmd) es un lenguaje de scripting para Windows."},
+                    {type: "text", text: "Consiste en una serie de comandos que se ejecutan en orden."},
+                    {type: "text", text: "Para crear un script, solo necesitas un editor de texto (Bloc de notas) y guardar el archivo con extensión .bat."},
+                    {type: "text", text: "Luego, haz doble clic para ejecutarlo en la consola."},
+                    {type: "text", text: "Hoy en día, Batch sigue siendo útil para automatizar tareas repetitivas."},
+                    {type: "command", text: "Para continuar, escribe: continuar"},
+                ],
+                tasks: [
+                    { id: "continuar1", description: "Escribe 'continuar' para avanzar", expected: "continuar", success: "¡Correcto! Has completado la introducción." }
+                ]
+            },
+            2: {
+                title: "Primeros comandos: echo, pause, cls, title, color",
+                content: [
+                    {type: "info", text: "=== LECCIÓN 2: COMANDOS ESENCIALES ==="},
+                    {type: "text", text: "1. ECHO: Muestra mensajes en pantalla."},
+                    {type: "code", text: "   echo Hola Mundo"},
+                    {type: "text", text: "2. PAUSE: Detiene la ejecución hasta que pulses una tecla."},
+                    {type: "code", text: "   pause"},
+                    {type: "text", text: "3. CLS: Limpia la pantalla de la consola."},
+                    {type: "code", text: "   cls"},
+                    {type: "text", text: "4. TITLE: Cambia el título de la ventana."},
+                    {type: "code", text: "   title Mi Script"},
+                    {type: "text", text: "5. COLOR: Cambia los colores de fondo y texto."},
+                    {type: "code", text: "   color 0A  (fondo negro, texto verde)"},
+                    {type: "task", text: "PRÁCTICA: Escribe cada uno de los siguientes comandos."},
+                ],
+                tasks: [
+                    { id: "echo", description: "Ejecuta 'echo Hola'", expected: "echo Hola", success: "✅ echo funcionando." },
+                    { id: "pause", description: "Ejecuta 'pause'", expected: "pause", success: "⏸️ pause ejecutado." },
+                    { id: "cls", description: "Ejecuta 'cls' (limpia la terminal simulada)", expected: "cls", success: "🧹 Pantalla limpiada (simulado)." },
+                    { id: "title", description: "Ejecuta 'title MiCurso'", expected: "title MiCurso", success: "📌 Título cambiado." },
+                    { id: "color", description: "Ejecuta 'color 0A'", expected: "color 0A", success: "🎨 Color cambiado a verde sobre negro." }
+                ]
+            },
+            3: {
+                title: "Variables y entrada de usuario",
+                content: [
+                    {type: "info", text: "=== LECCIÓN 3: VARIABLES Y ENTRADA ==="},
+                    {type: "text", text: "Las variables en Batch se definen con SET."},
+                    {type: "code", text: "   set nombre=Juan"},
+                    {type: "code", text: "   echo %nombre%   (muestra Juan)"},
+                    {type: "text", text: "Para pedir datos al usuario: SET /P"},
+                    {type: "code", text: "   set /p edad=¿Cuántos años tienes? "},
+                    {type: "text", text: "Ejercicios: crea una variable, muéstrala y solicita un dato."}
+                ],
+                tasks: [
+                    { id: "set_var", description: "Crea variable 'curso' con valor 'Batch'", expected: "set curso=Batch", success: "✅ Variable curso creada." },
+                    { id: "echo_var", description: "Muestra la variable: echo %curso%", expected: "echo %curso%", success: "📢 Muestra el valor." },
+                    { id: "setp", description: "Pide nombre: set /p nombre=¿Cómo te llamas? ", expected: "set /p nombre=¿Cómo te llamas? ", success: "⌨️ Esperando entrada del usuario (simulado)." }
+                ]
+            },
+            4: {
+                title: "Estructuras de control: IF, FOR, GOTO",
+                content: [
+                    {type: "info", text: "=== LECCIÓN 4: CONDICIONALES Y BUCLES ==="},
+                    {type: "text", text: "IF: ejecuta comandos si se cumple una condición."},
+                    {type: "code", text: "   if %variable%==valor (echo Igual) else (echo Distinto)"},
+                    {type: "text", text: "FOR: repite comandos para un conjunto de elementos."},
+                    {type: "code", text: "   for %%i in (1 2 3) do echo %%i"},
+                    {type: "text", text: "GOTO: salta a una etiqueta."},
+                    {type: "code", text: "   :inicio"},
+                    {type: "code", text: "   echo Hola"},
+                    {type: "code", text: "   goto fin"},
+                    {type: "code", text: "   :fin"},
+                    {type: "text", text: "Ejercicios: prueba cada estructura."}
+                ],
+                tasks: [
+                    { id: "if", description: "Escribe un IF simple: if 1==1 (echo ok)", expected: "if 1==1 (echo ok)", success: "✅ Condicional correcto." },
+                    { id: "for", description: "Escribe un FOR: for %%i in (a b) do echo %%i", expected: "for %%i in (a b) do echo %%i", success: "🔄 Bucle ejecutado." },
+                    { id: "goto", description: "Define una etiqueta y salta: escribe ':marca' o 'goto marca'", expected: ":marca", altExpected: "goto marca", success: "🏷️ GOTO simulado." }
+                ]
+            },
+            5: {
+                title: "Crear un menú interactivo",
+                content: [
+                    {type: "info", text: "=== LECCIÓN 5: MENÚ INTERACTIVO ==="},
+                    {type: "text", text: "Un menú combina echo, set /p, if y goto."},
+                    {type: "code", text: "   @echo off"},
+                    {type: "code", text: "   :menu"},
+                    {type: "code", text: "   echo 1. Opción A"},
+                    {type: "code", text: "   echo 2. Opción B"},
+                    {type: "code", text: "   set /p opcion=Selecciona: "},
+                    {type: "code", text: "   if %opcion%==1 goto a"},
+                    {type: "code", text: "   if %opcion%==2 goto b"},
+                    {type: "code", text: "   goto menu"},
+                    {type: "code", text: "   :a ..."},
+                    {type: "text", text: "Ejercicio: Escribe las líneas básicas de un menú."}
+                ],
+                tasks: [
+                    { id: "menu_label", description: "Crea la etiqueta :menu", expected: ":menu", success: "🏷️ Etiqueta :menu creada." },
+                    { id: "menu_echo1", description: "Muestra una opción: echo 1. Jugar", expected: "echo 1. Jugar", success: "1️⃣ Opción mostrada." },
+                    { id: "menu_echo2", description: "Muestra segunda opción: echo 2. Salir", expected: "echo 2. Salir", success: "2️⃣ Opción mostrada." },
+                    { id: "menu_input", description: "Pide la opción: set /p opcion=Elige: ", expected: "set /p opcion=Elige: ", success: "⌨️ Entrada lista." },
+                    { id: "menu_if", description: "Condicional: if %opcion%==1 goto jugar", expected: "if %opcion%==1 goto jugar", success: "🔀 Condicional agregado." }
+                ]
+            },
+            6: {
+                title: "Desarrolla tu propio BAT",
+                content: [
+                    {type: "info", text: "=== LECCIÓN 6: PROYECTO FINAL ==="},
+                    {type: "text", text: "¡Has llegado al final del curso!"},
+                    {type: "text", text: "Ahora debes crear tu propio script Batch. Puede ser un juego, una calculadora, un administrador..."},
+                    {type: "text", text: "Para completar este paso, escribe: 'mi script'"},
+                    {type: "text", text: "Una vez lo hagas, podrás generar tu certificado."}
+                ],
+                tasks: [
+                    { id: "finish", description: "Escribe 'mi script' para declarar que has creado tu BAT", expected: "mi script", success: "🎉 ¡Enhorabuena! Has completado el Reto Batch." }
+                ]
+            }
+        };
+
+        // Variables de la terminal
+        let terminalOutput, terminalHistory, terminalInput;
+
+        // Cargar progreso guardado
+        function loadProgress() {
+            const saved = localStorage.getItem('retoBatchProgress');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    userProgress.currentStep = parsed.currentStep || 1;
+                    userProgress.completedSteps = parsed.completedSteps || [];
+                    userProgress.tasksCompleted = parsed.tasksCompleted || {1:[],2:[],3:[],4:[],5:[],6:[]};
+                } catch(e) {}
+            }
+            // Asegurar que completedSteps no contenga pasos no alcanzados
+            userProgress.completedSteps = userProgress.completedSteps.filter(s => s <= 6);
+            if (userProgress.currentStep > 6) userProgress.currentStep = 6;
+        }
+        function saveProgress() {
+            localStorage.setItem('retoBatchProgress', JSON.stringify(userProgress));
+        }
+
+        // Inicializar terminal
+        function initTerminal() {
+            terminalOutput = document.getElementById('terminalOutput');
+            terminalOutput.innerHTML = '';
+            terminalHistory = document.createElement('div');
+            terminalHistory.id = 'terminalHistory';
+            terminalOutput.appendChild(terminalHistory);
+            
+            addLine('Bienvenido al <span style="color:#00a8ff;">Reto Web Batch - Modo Tutorial</span>', 'info');
+            addLine('Escribe <span class="terminal-prompt">help</span> para ver los comandos.', 'info');
+            
+            const inputLine = document.createElement('div');
+            inputLine.style.display = 'flex';
+            inputLine.style.alignItems = 'center';
+            inputLine.style.marginTop = '8px';
+            const promptSpan = document.createElement('span');
+            promptSpan.className = 'terminal-prompt';
+            promptSpan.innerHTML = 'C:\\reto-batch&gt;';
+            terminalInput = document.createElement('input');
+            terminalInput.type = 'text';
+            terminalInput.className = 'terminal-input';
+            terminalInput.id = 'terminalInput';
+            terminalInput.autocomplete = 'off';
+            inputLine.appendChild(promptSpan);
+            inputLine.appendChild(terminalInput);
+            terminalOutput.appendChild(inputLine);
+            
+            terminalInput.focus();
+            terminalInput.addEventListener('keypress', handleTerminalKeyPress);
+        }
+
+        // Añadir línea a la terminal
+        function addLine(text, type = '') {
+            if (!terminalHistory) {
+                // Si no hay historial, esperar un poco o crearlo
+                if (!terminalOutput) return;
+                terminalHistory = document.createElement('div');
+                terminalHistory.id = 'terminalHistory';
+                terminalOutput.appendChild(terminalHistory);
+            }
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            if (type === 'success') line.style.color = '#4CAF50';
+            else if (type === 'error') line.style.color = '#ff6b6b';
+            else if (type === 'info') line.style.color = '#00a8ff';
+            else if (type === 'warning') line.style.color = '#ffd93d';
+            else if (type === 'code') { line.style.color = '#fff'; line.style.backgroundColor = '#333'; line.style.padding = '2px 6px'; line.style.borderRadius = '4px'; line.style.margin = '2px 0'; }
+            line.innerHTML = text;
+            terminalHistory.appendChild(line);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        // Mostrar lección en la terminal
+        function showLesson(step) {
+            const lesson = lessons[step];
+            if (!lesson) return;
+            addLine('', '');
+            addLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'info');
+            addLine(lesson.title, 'info');
+            addLine('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'info');
+            lesson.content.forEach(item => {
+                if (item.type === 'text') addLine(item.text, '');
+                else if (item.type === 'code') addLine(item.text, 'code');
+                else if (item.type === 'info') addLine(item.text, 'info');
+                else if (item.type === 'task') addLine(item.text, 'warning');
+                else if (item.type === 'command') addLine(item.text, 'success');
+            });
+            
+            // Mostrar tareas pendientes
+            const pending = lesson.tasks.filter(t => !userProgress.tasksCompleted[step].includes(t.id));
+            if (pending.length > 0) {
+                addLine('', '');
+                addLine('📋 TAREAS PENDIENTES:', 'warning');
+                pending.forEach(t => addLine('   • ' + t.description, ''));
+            } else {
+                // Si no hay tareas pendientes y el paso no está completado, podemos completarlo automáticamente?
+                if (!userProgress.completedSteps.includes(step)) {
+                    completeStep(step);
+                }
+            }
+        }
+
+        // Completar un paso y avanzar si corresponde
+        function completeStep(step) {
+            if (userProgress.completedSteps.includes(step)) return;
+            userProgress.completedSteps.push(step);
+            // Si el paso actual es el que se completó y hay siguiente, avanzar
+            if (step === userProgress.currentStep && step < 6) {
+                userProgress.currentStep++;
+            }
+            if (step === 6) {
+                userProgress.currentStep = 7; // Indica que ya terminó
+            }
+            saveProgress();
+            addLine(`🏆 ¡Lección ${step} completada!`, 'success');
+            if (step < 6) {
+                addLine(`Has desbloqueado la Lección ${step+1}.`, 'info');
+                // Mostrar la siguiente lección automáticamente
+                if (userProgress.currentStep <= 6) {
+                    showLesson(userProgress.currentStep);
+                }
+            } else {
+                addLine('🎉 ¡Felicidades! Has completado TODAS las lecciones. Ahora puedes generar tu certificado.', 'success');
+            }
+            updateUI();
+        }
+
+        // Procesar comando escrito por el usuario
+        function handleTerminalKeyPress(e) {
+            if (e.key === 'Enter') {
+                const input = terminalInput.value.trim();
+                terminalInput.value = '';
+                if (input === '') return;
+                
+                addLine(`<span class="terminal-prompt">C:\\reto-batch&gt;</span> ${input}`, '');
+                
+                const lowerInput = input.toLowerCase();
+                const parts = input.split(' ');
+                const base = parts[0].toLowerCase();
+
+                // --- COMANDOS GLOBALES ---
+                if (base === 'help') {
+                    addLine('COMANDOS DISPONIBLES:', 'info');
+                    addLine('  help          - Muestra esta ayuda', '');
+                    addLine('  progreso      - Ver tu progreso actual', '');
+                    addLine('  reiniciar     - Reinicia todo el progreso', 'warning');
+                    addLine('  leccion [n]   - Muestra la lección n (si está desbloqueada)', '');
+                    addLine('  continuar     - Avanza a la siguiente lección (si todas las tareas están hechas)', '');
+                    addLine('  tareas        - Muestra las tareas pendientes de la lección actual', '');
+                    addLine('Además, escribe los comandos Batch que se piden en los ejercicios.', 'success');
+                    return;
+                }
+                if (base === 'progreso') {
+                    addLine(`Paso actual: ${userProgress.currentStep}`, 'info');
+                    addLine(`Completados: ${userProgress.completedSteps.join(', ') || 'ninguno'}`, 'info');
+                    return;
+                }
+                if (base === 'reiniciar') {
+                    userProgress = {
+                        currentStep: 1,
+                        completedSteps: [],
+                        tasksCompleted: {1:[],2:[],3:[],4:[],5:[],6:[]}
+                    };
+                    saveProgress();
+                    // Limpiar terminal y reiniciar vista
+                    terminalHistory.innerHTML = '';
+                    addLine('⚠️ Progreso reiniciado. Comenzamos desde la lección 1.', 'warning');
+                    showLesson(1);
+                    updateUI();
+                    return;
+                }
+                if (base === 'leccion' && parts.length > 1) {
+                    const num = parseInt(parts[1]);
+                    if (!isNaN(num) && num >= 1 && num <= 6) {
+                        if (num <= userProgress.currentStep || userProgress.completedSteps.includes(num)) {
+                            showLesson(num);
+                        } else {
+                            addLine(`❌ La lección ${num} aún no está desbloqueada. Completa primero la lección ${userProgress.currentStep}.`, 'error');
+                        }
+                    }
+                    return;
+                }
+                if (base === 'tareas') {
+                    const step = userProgress.currentStep;
+                    if (step > 6) { addLine('Ya completaste todas las tareas. ¡Felicidades!', 'success'); return; }
+                    const lesson = lessons[step];
+                    const pending = lesson.tasks.filter(t => !userProgress.tasksCompleted[step].includes(t.id));
+                    if (pending.length === 0) {
+                        addLine('🎯 No hay tareas pendientes en esta lección. Escribe "continuar" para avanzar.', 'success');
+                    } else {
+                        addLine(`📋 Tareas pendientes (lección ${step}):`, 'warning');
+                        pending.forEach(t => addLine('   • ' + t.description, ''));
+                    }
+                    return;
+                }
+                if (base === 'continuar') {
+                    const step = userProgress.currentStep;
+                    if (step > 6) {
+                        addLine('Ya completaste el curso. Genera tu certificado en la sección correspondiente.', 'info');
+                        return;
+                    }
+                    const lesson = lessons[step];
+                    const pendingCount = lesson.tasks.filter(t => !userProgress.tasksCompleted[step].includes(t.id)).length;
+                    if (pendingCount === 0) {
+                        // Si no hay tareas pendientes, completar el paso
+                        if (!userProgress.completedSteps.includes(step)) {
+                            completeStep(step);
+                        } else {
+                            // Si ya estaba completado pero no se avanzó por algún motivo, forzar avance
+                            if (step < 6) {
+                                userProgress.currentStep++;
+                                saveProgress();
+                                addLine(`Avanzando a la lección ${userProgress.currentStep}...`, 'info');
+                                showLesson(userProgress.currentStep);
+                                updateUI();
+                            }
+                        }
+                    } else {
+                        addLine(`❌ Debes completar todas las tareas antes de continuar. Te faltan ${pendingCount}.`, 'error');
+                    }
+                    return;
+                }
+
+                // --- VERIFICAR SI ES UNA TAREA DEL PASO ACTUAL ---
+                const currentStep = userProgress.currentStep;
+                if (currentStep > 6) {
+                    addLine('🎉 ¡Ya terminaste el curso! Puedes generar tu certificado.', 'success');
+                    return;
+                }
+                const lesson = lessons[currentStep];
+                // Buscar tarea pendiente que coincida exactamente con el input (ignorando mayúsculas, espacios extras)
+                const task = lesson.tasks.find(t => 
+                    !userProgress.tasksCompleted[currentStep].includes(t.id) && 
+                    (input === t.expected || (t.altExpected && input === t.altExpected))
+                );
+                if (task) {
+                    // Marcar tarea como completada
+                    userProgress.tasksCompleted[currentStep].push(task.id);
+                    saveProgress();
+                    addLine('✅ ' + task.success, 'success');
+                    
+                    // Verificar si con esta tarea ya se completaron todas las tareas de la lección
+                    const allTasksCompleted = lesson.tasks.every(t => userProgress.tasksCompleted[currentStep].includes(t.id));
+                    if (allTasksCompleted) {
+                        addLine('🎓 ¡Has completado todas las tareas de esta lección!', 'success');
+                        addLine('Escribe "continuar" para avanzar a la siguiente lección.', 'info');
+                        // Opcional: completar el paso automáticamente (algunos prefieren que sea manual)
+                        // completeStep(currentStep); // Si se desea automático, descomentar esta línea
+                    }
+                    updateUI();
+                } else {
+                    addLine(`❌ Comando no reconocido o no es parte de los ejercicios actuales. Escribe "help" para ver comandos.`, 'error');
+                }
+            }
+        }
+
+        // Actualizar la interfaz de progreso y pasos
+        function updateUI() {
+            const progress = ((userProgress.completedSteps.length) / 6) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            const stepsContainer = document.getElementById('stepsContainer');
+            stepsContainer.innerHTML = '';
+            for (let i = 1; i <= 6; i++) {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                if (userProgress.completedSteps.includes(i)) stepDiv.classList.add('completed');
+                else if (i > userProgress.currentStep) stepDiv.classList.add('locked');
+                stepDiv.innerHTML = `
+                    <div class="step-number">${i}</div>
+                    <h4>Lección ${i}: ${lessons[i].title}</h4>
+                    <p>${lessons[i].content.find(c => c.type === 'text')?.text.substring(0, 50) || ''}...</p>
+                `;
+                stepDiv.addEventListener('click', () => {
+                    if (i <= userProgress.currentStep || userProgress.completedSteps.includes(i)) {
+                        showLesson(i);
+                    } else {
+                        addLine(`❌ Lección ${i} bloqueada. Completa primero la lección ${userProgress.currentStep}.`, 'error');
+                    }
+                });
+                stepsContainer.appendChild(stepDiv);
+            }
+        }
+
+        // --- FUNCIÓN PARA DESCARGAR EL PROGRAMA DE MANTENIMIENTO ---
+        function downloadMantenimientoBat() {
+            // Contenido exacto del archivo .bat proporcionado
+            const batContent = `@echo off
+chcp 65001 > nul
+title Mantenimiento - Menu principal
+color 1f
+mode con: cols=80 lines=25
+
+:inicio
+cls
+echo ==================================
+echo     MANTENIMIENTO DEL PC
+echo ==================================
+echo 1. Limpiar archivos temporales
+echo 2. Liberar cache DNS
+echo 3. Desfragmentar disco duro
+echo 4. Generar informe del sistema
+echo 5. Buscar y eliminar malware
+echo 6. Vaciar la papelera de reciclaje
+echo 7. Copia de seguridad
+echo 8. Comprobar archivos dañados (SFC)
+echo 9. Restaurar sistema
+echo 10. Analisis y reparacion del sistema
+echo 11. Salir
+echo ==================================
+echo.
+set /p option=Selecciona una opcion (1-11):
+
+if "%option%"=="1" goto limpiar_temporales
+if "%option%"=="2" goto liberar_dns
+if "%option%"=="3" goto desfragmentar
+if "%option%"=="4" goto generar_informe
+if "%option%"=="5" goto buscar_malware
+if "%option%"=="6" goto vaciar_papelera
+if "%option%"=="7" goto copia_seguridad
+if "%option%"=="8" goto archivos_danados
+if "%option%"=="9" goto restaurar
+if "%option%"=="10" call analisisyreparacion.bat
+if "%option%"=="11" exit
+
+echo Opcion no valida.
+pause
+goto inicio
+
+:limpiar_temporales
+cls
+del /s /q "%temp%\\*" >nul 2>&1
+del /s /q "C:\\Windows\\Temp\\*" >nul 2>&1
+pause
+goto inicio
+
+:liberar_dns
+cls
+ipconfig /flushdns
+pause
+goto inicio
+
+:desfragmentar
+cls
+set /p confirmar=¿Deseas desfragmentar el disco C:? (s/n):
+if /I "%confirmar%"=="s" defrag C:
+pause
+goto inicio
+
+:generar_informe
+cls
+systeminfo > "C:\\informe_sistema.txt"
+pause
+goto inicio
+
+:buscar_malware
+cls
+PowerShell -Command "Start-MpScan -ScanType FullScan"
+pause
+goto inicio
+
+:vaciar_papelera
+cls
+PowerShell -Command "Clear-RecycleBin -Force"
+pause
+goto inicio
+
+:copia_seguridad
+cls
+set /p origen=Ruta de la carpeta origen:
+set /p destino=Ruta de destino:
+xcopy "%origen%" "%destino%" /E /H /C /I /Y
+pause
+goto inicio
+
+:archivos_danados
+cls
+sfc /scannow
+pause
+goto inicio
+
+:restaurar
+cls
+rstrui.exe
+pause
+goto inicio`;
+
+            const blob = new Blob([batContent], { type: 'application/bat' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mantenimiento_PC.bat';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // Mensaje en consola
+            addLine('📥 Descargando: mantenimiento_PC.bat', 'info');
+        }
+
+        // --- INICIALIZACIÓN ---
+        window.onload = function() {
+            loadProgress();
+            initTerminal();
+            showLesson(userProgress.currentStep);
+            updateUI();
+            
+            // Fondo de código animado
+            const codeBackground = document.getElementById('codeBackground');
+            const codeLines = [
+                "@echo off", "title Mi Juego en Batch", "color 0A", "echo Bienvenido al Reto Batch",
+                "set /p nombre=¿Cuál es tu nombre?", "echo Hola %nombre%, vamos a comenzar",
+                "pause", "goto menu", ":menu", "cls", "echo 1. Juego de Adivinanza", "echo 2. Calculadora",
+                "echo 3. Salir", "set /p opcion=Selecciona una opción:", "if %opcion%==1 goto juego",
+                "if %opcion%==2 goto calculadora", "if %opcion%==3 goto fin", "goto menu"
+            ];
+            codeLines.forEach((line, i) => {
+                const el = document.createElement('div');
+                el.className = 'code-line';
+                el.textContent = line;
+                el.style.top = `${10 + i * 28}px`;
+                el.style.left = `${10 + (i % 3) * 280}px`;
+                codeBackground.appendChild(el);
+            });
+        };
+
+        // Funciones para descargas y certificado
+        window.downloadFile = function(filename, downloadAs) {
+            // Simula descarga; en un entorno real, los archivos deben existir en /downloads/
+            const link = document.createElement('a');
+            link.href = `downloads/${filename}`;
+            link.download = downloadAs || filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            addLine(`📥 Descargando: ${downloadAs || filename}`, 'info');
+        };
+
+        document.getElementById('generateCertificateBtn').addEventListener('click', function() {
+            if (userProgress.completedSteps.includes(6)) {
+                const name = document.getElementById('nameInput').value.trim() || 'Guerrero Batch';
+                document.getElementById('userName').innerText = name;
+                const now = new Date();
+                document.getElementById('certificateDate').innerText = now.toLocaleDateString('es-ES', {year:'numeric', month:'long', day:'numeric'});
+                document.getElementById('downloadCertificateBtn').style.display = 'inline-flex';
+                this.textContent = '¡Certificado Generado!';
+                this.style.backgroundColor = '#4CAF50';
+                addLine(`🎖️ Certificado generado para ${name}`, 'success');
+            } else {
+                alert('❌ Debes completar las 6 lecciones antes de obtener el certificado.');
+            }
+        });
+
+        window.updateCertificateName = function() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (name) {
+                document.getElementById('userName').innerText = name;
+                addLine(`✏️ Nombre actualizado: ${name}`, 'info');
+            }
+        };
+
+        document.getElementById('downloadCertificateBtn').addEventListener('click', function() {
+            const name = document.getElementById('userName').innerText;
+            const date = document.getElementById('certificateDate').innerText;
+            const content = `CERTIFICADO RETO BATCH\n\nOtorgado a: ${name}\nFecha: ${date}\n\nPor completar el Reto Web Batch y demostrar habilidades en Batch.\n\n¡Guerrero Batch!`;
+            const blob = new Blob([content], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Certificado_${name.replace(/\s+/g,'_')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Mobile menu
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({behavior: 'smooth', block: 'start'});
+            });
+        });
+    </script>
+</body>
+</html>
